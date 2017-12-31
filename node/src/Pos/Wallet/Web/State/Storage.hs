@@ -77,6 +77,7 @@ module Pos.Wallet.Web.State.Storage
        , casPtxCondition
        , ptxUpdateMeta
        , addOnlyNewPendingTx
+       , cancelApplyingPtxs
        ) where
 
 import           Universum
@@ -109,7 +110,8 @@ import           Pos.Wallet.Web.ClientTypes     (AccountId, Addr, CAccountMeta, 
 import           Pos.Wallet.Web.Pending.Types   (PendingTx (..), PtxCondition,
                                                  PtxSubmitTiming (..), ptxCond,
                                                  ptxSubmitTiming)
-import           Pos.Wallet.Web.Pending.Updates (incPtxSubmitTimingPure,
+import           Pos.Wallet.Web.Pending.Updates (cancelApplyingPtx,
+                                                 incPtxSubmitTimingPure,
                                                  mkPtxSubmitTiming,
                                                  ptxMarkAcknowledgedPure)
 
@@ -486,6 +488,11 @@ ptxUpdateMeta wid txId updType =
                 ptxSubmitTiming .~ mkPtxSubmitTiming curSlot
             PtxMarkAcknowledged ->
                 ptxMarkAcknowledgedPure
+
+cancelApplyingPtxs :: Update ()
+cancelApplyingPtxs =
+    wsWalletInfos . traversed .
+    wsPendingTxs . traversed %= cancelApplyingPtx
 
 addOnlyNewPendingTx :: PendingTx -> Update ()
 addOnlyNewPendingTx ptx =

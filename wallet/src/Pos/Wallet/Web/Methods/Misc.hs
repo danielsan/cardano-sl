@@ -17,6 +17,8 @@ module Pos.Wallet.Web.Methods.Misc
        , testResetAll
        , dumpState
        , WalletStateSnapshot (..)
+
+       , cancelAllApplyingPtxs
        ) where
 
 import           Universum
@@ -39,7 +41,8 @@ import           Pos.Wallet.Web.ClientTypes   (Addr, CId, CProfile (..), CUpdate
                                                SyncProgress (..), cIdToAddress)
 import           Pos.Wallet.Web.Error         (WalletError (..))
 import           Pos.Wallet.Web.Mode          (MonadWalletWebMode)
-import           Pos.Wallet.Web.State         (getNextUpdate, getProfile,
+import           Pos.Wallet.Web.State         (cancelApplyingPtxs, getNextUpdate,
+                                               getProfile,
                                                getWalletStorage, removeNextUpdate,
                                                setProfile, testReset)
 import           Pos.Wallet.Web.State.Storage (WalletStorage)
@@ -129,3 +132,6 @@ instance Buildable WalletStateSnapshot where
 
 dumpState :: MonadWalletWebMode m => m WalletStateSnapshot
 dumpState = WalletStateSnapshot <$> getWalletStorage
+
+cancelAllApplyingPtxs :: MonadWalletWebMode m => m ()
+cancelAllApplyingPtxs = testOnlyEndpoint cancelApplyingPtxs
